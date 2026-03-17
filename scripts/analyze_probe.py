@@ -18,7 +18,9 @@ from src.visualization import plot_all_rocs_in_directory
 
 def main():
     parser = argparse.ArgumentParser(description="Analyze probe performance")
-    parser.add_argument("--model", required=True, help="Model path or name")
+    parser.add_argument("--model", help="Model path or name")
+    parser.add_argument("--test-mode", action="store_true",
+                        help="Use Llama 3.2 1B for local testing")
     parser.add_argument("--vectors", required=True, help="Directory with vectors")
     parser.add_argument("--data", required=True, help="Path to test dataset")
     parser.add_argument("--output", required=True, help="Output directory")
@@ -28,7 +30,15 @@ def main():
     parser.add_argument("--visualize", action="store_true", help="Generate visualizations")
     parser.add_argument("--show-plots", action="store_true", help="Show plots (requires display)")
     args = parser.parse_args()
-    
+
+    # Handle test mode
+    if args.test_mode:
+        if args.model is None:
+            args.model = "meta-llama/Llama-3.2-1B-Instruct"
+        print(f"[TEST MODE] Using model: {args.model}")
+    elif args.model is None:
+        parser.error("--model is required unless using --test-mode")
+
     # Load model and vectors
     print(f"Loading model: {args.model}")
     model, tokenizer = load_model(args.model)
