@@ -28,6 +28,9 @@ def extract_activations_all_layers(model, tokens, token_type, layers, tokenizer=
 
     def make_hook(layer):
         def hook_fn(activation, hook):
+            # Find all positions where token_type (e.g. "A") appears, take the last one.
+            # Assumes the answer token is the last occurrence in the prompt.
+            # Fragile: breaks if a standalone "A" appears after the answer.
             token_positions = (tokens == tokenizer.convert_tokens_to_ids(token_type)).nonzero()[-1]
             last_pos = token_positions[-1]
             print(f"Extracting activation for token '{token_type}' at position {last_pos} (layer {layer})")
